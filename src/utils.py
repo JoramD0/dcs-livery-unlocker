@@ -1,6 +1,7 @@
-import os
+import os, shutil
 
 from glob import glob
+
 
 def check_saved_games(saved_games_dcs_dir):
     for folder_name in os.listdir(saved_games_dcs_dir):
@@ -57,7 +58,21 @@ class Utils:
 
         for file_path in glob(CORE_MODS_GLOB_STR):
             if 'Pack\Liveries' not in file_path:
-                self.comment_out_countries_restriction(file_path)
+                with open(file_path, 'r', encoding='UTF-8') as f:
+                    if 'countries = {' in f.read():
+                        # Move file to SavedGames
+                        main_path = os.path.abspath(file_path)
+                        vehicle_name = os.path.basename(os.path.normpath(os.path.join(main_path, os.pardir, os.pardir)))
+                        texture_name = os.path.basename(os.path.normpath(os.path.join(main_path, os.pardir)))
+
+                        target_path = os.path.join(self.saved_games_dcs_dir, 'Liveries/', vehicle_name, texture_name, 'description.lua')
+                        try:
+                            os.makedirs(os.path.dirname(target_path), exist_ok=True)
+                            shutil.copy(main_path, target_path)
+                        except shutil.Error as err:
+                                print(err.args[0])
+
+                        self.comment_out_countries_restriction(target_path)
 
 
     def fix_downloaded_liveries(self):
@@ -68,6 +83,7 @@ class Utils:
             self.comment_out_countries_restriction(file_path)
 
 
+    # Not used
     def fix_mods_liveries(self):
 
         SAVED_GAMES_MODS_LIVERIES = os.path.join(self.saved_games_dcs_dir, '?ods/aircraft/**/Liveries/**/*.lua')
@@ -82,7 +98,21 @@ class Utils:
         CORE_MODS_GLOB_STR = os.path.join(self.dcs_dir, 'Bazar/Liveries/**/**/*.lua')
 
         for file_path in glob(CORE_MODS_GLOB_STR):
-            self.comment_out_countries_restriction(file_path)
+            with open(file_path, 'r', encoding='UTF-8') as f:
+                if 'countries = {' in f.read():
+                    # Move file to SavedGames
+                    main_path = os.path.abspath(file_path)
+                    vehicle_name = os.path.basename(os.path.normpath(os.path.join(main_path, os.pardir, os.pardir)))
+                    texture_name = os.path.basename(os.path.normpath(os.path.join(main_path, os.pardir)))
+
+                    target_path = os.path.join(self.saved_games_dcs_dir, 'Liveries/', vehicle_name, texture_name, 'description.lua')
+                    try:
+                        os.makedirs(os.path.dirname(target_path), exist_ok=True)
+                        shutil.copy(main_path, target_path)
+                    except shutil.Error as err:
+                            print(err.args[0])
+
+                    self.comment_out_countries_restriction(target_path)
 
 
 class Notifier:

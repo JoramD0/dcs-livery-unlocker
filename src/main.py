@@ -52,7 +52,7 @@ def main():
                 try:
                     utils.fix_default_liveries()
                     # utils.fix_mods_liveries() # this one is commented because each mod does it their own way
-                    utils.fix_downloaded_liveries()
+                    # utils.fix_downloaded_liveries() # Not useful to me
                     utils.fix_bazar_liveries()
 
                     notifications.add('Done! You may close the program.')
